@@ -105,19 +105,19 @@ export default function QuestionForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8"
+      className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     >
       <div className="flex items-center gap-2">
-        <h1 className="text-2xl font-bold text-white">질문 작성</h1>
-        <span className="rounded-full bg-slate-700/50 px-2.5 py-0.5 text-xs font-medium text-slate-300">
+        <h1 className="text-2xl font-bold text-slate-900">질문 작성</h1>
+        <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-medium text-slate-500">
           익명
         </span>
       </div>
-      <p className="mt-2 text-sm text-slate-400">이름 없이 자유롭게 질문해 주세요.</p>
+      <p className="mt-2 text-sm text-slate-500">이름 없이 자유롭게 질문해 주세요.</p>
 
       <div className="mt-6 space-y-5">
         <div>
-          <label htmlFor="title" className="mb-1.5 block text-sm font-medium text-slate-300">
+          <label htmlFor="title" className="mb-1.5 block text-sm font-medium text-slate-700">
             제목
           </label>
           <input
@@ -125,13 +125,13 @@ export default function QuestionForm() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-            className="w-full rounded-xl border border-white/10 bg-slate-900/50 px-4 py-3 text-white focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30"
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
             placeholder="질문 제목"
           />
         </div>
 
         <div>
-          <label htmlFor="content" className="mb-1.5 block text-sm font-medium text-slate-300">
+          <label htmlFor="content" className="mb-1.5 block text-sm font-medium text-slate-700">
             내용
           </label>
           <textarea
@@ -140,17 +140,17 @@ export default function QuestionForm() {
             onChange={(e) => setContent(e.target.value)}
             required
             rows={6}
-            className="w-full resize-none rounded-xl border border-white/10 bg-slate-900/50 px-4 py-3 text-white focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30"
+            className="w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
             placeholder="궁금한 내용을 자세히 적어 주세요"
           />
         </div>
 
         <div>
           <div className="mb-1.5 flex items-center justify-between">
-            <label className="text-sm font-medium text-slate-300">
+            <label className="text-sm font-medium text-slate-700">
               스크린샷 (선택, 최대 {MAX_QUESTION_IMAGES}장)
             </label>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-slate-400">
               {images.length}/{MAX_QUESTION_IMAGES}
             </span>
           </div>
@@ -165,8 +165,8 @@ export default function QuestionForm() {
             onClick={() => fileInputRef.current?.click()}
             className={`cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition ${
               dragging
-                ? "border-violet-500 bg-violet-500/10"
-                : "border-white/10 bg-slate-900/30 hover:border-violet-500/40 hover:bg-slate-900/50"
+                ? "border-violet-400 bg-violet-50"
+                : "border-slate-300 bg-slate-50 hover:border-violet-300 hover:bg-violet-50/50"
             }`}
           >
             <input
@@ -181,7 +181,7 @@ export default function QuestionForm() {
               }}
             />
             <svg
-              className="mx-auto h-10 w-10 text-slate-500"
+              className="mx-auto h-10 w-10 text-slate-400"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -193,16 +193,16 @@ export default function QuestionForm() {
                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <p className="mt-3 text-sm text-slate-400">
+            <p className="mt-3 text-sm text-slate-500">
               이미지를 드래그하거나 클릭해서 업로드
             </p>
-            <p className="mt-1 text-xs text-slate-500">JPEG, PNG, GIF, WEBP</p>
+            <p className="mt-1 text-xs text-slate-400">JPEG, PNG, GIF, WEBP</p>
           </div>
 
           {images.length > 0 && (
             <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {images.map((img) => (
-                <div key={img.id} className="group relative overflow-hidden rounded-xl border border-white/10">
+                <div key={img.id} className="group relative overflow-hidden rounded-xl border border-slate-200">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={img.preview} alt="" className="aspect-video w-full object-cover" />
                   <button
@@ -226,14 +226,14 @@ export default function QuestionForm() {
       </div>
 
       {error && (
-        <p className="mt-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-400">{error}</p>
+        <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
       )}
 
       <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <button
           type="button"
           onClick={() => router.push("/questions")}
-          className="rounded-xl border border-white/10 px-6 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/5"
+          className="rounded-xl border border-slate-200 px-6 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
         >
           취소
         </button>

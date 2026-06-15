@@ -58,8 +58,8 @@ export default function QuestionsPage() {
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
       <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-white">질문게시판</h1>
-          <p className="mt-2 text-slate-400">익명으로 질문하고 답변 현황을 확인하세요.</p>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">질문게시판</h1>
+          <p className="mt-2 text-slate-500">익명으로 질문하고 답변 현황을 확인하세요.</p>
         </div>
         <Link
           href="/questions/new"
@@ -74,11 +74,11 @@ export default function QuestionsPage() {
           value={searchInput}
           onChange={(e) => setSearchInput(e.target.value)}
           placeholder="제목·내용 검색"
-          className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-white placeholder:text-slate-500 focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30"
+          className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
         />
         <button
           type="submit"
-          className="rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-medium text-slate-300 transition hover:bg-white/10"
+          className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 shadow-sm transition hover:bg-slate-50"
         >
           검색
         </button>
@@ -96,26 +96,26 @@ export default function QuestionsPage() {
               }}
               className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
                 filter === f
-                  ? "bg-violet-600 text-white"
-                  : "bg-white/5 text-slate-400 hover:bg-white/10"
+                  ? "bg-violet-600 text-white shadow-sm"
+                  : "bg-white text-slate-500 ring-1 ring-slate-200 hover:bg-slate-50"
               }`}
             >
               {f === "all" ? "전체" : f === "open" ? "미해결" : "해결됨"}
             </button>
           ))}
         </div>
-        <p className="text-sm text-slate-500">총 {total}건</p>
+        <p className="text-sm text-slate-400">총 {total}건</p>
       </div>
 
       {loading ? (
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-28 animate-pulse rounded-2xl bg-white/5" />
+            <div key={i} className="h-28 animate-pulse rounded-2xl bg-slate-200/60" />
           ))}
         </div>
       ) : questions.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-white/10 py-16 text-center">
-          <p className="text-slate-500">
+        <div className="rounded-2xl border border-dashed border-slate-300 py-16 text-center">
+          <p className="text-slate-400">
             {search ? "검색 결과가 없습니다." : "등록된 질문이 없습니다."}
           </p>
         </div>
@@ -125,29 +125,29 @@ export default function QuestionsPage() {
             <Link
               key={question.id}
               href={`/questions/${question.id}`}
-              className={`block rounded-2xl border p-5 backdrop-blur-sm transition hover:border-violet-500/30 ${
+              className={`block rounded-2xl border p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100 ${
                 question.isResolved
-                  ? "border-emerald-500/20 bg-emerald-500/5"
-                  : "border-white/10 bg-white/5"
+                  ? "border-emerald-200 bg-emerald-50/60"
+                  : "border-slate-200 bg-white"
               }`}
             >
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-semibold text-white">{question.title}</h2>
+                <h2 className="font-semibold text-slate-900">{question.title}</h2>
                 <span
                   className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
                     question.isResolved
-                      ? "bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20"
-                      : "bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/20"
+                      ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
+                      : "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
                   }`}
                 >
                   {question.isResolved ? "해결됨" : "미해결"}
                 </span>
                 {question._count.images > 0 && (
-                  <span className="text-xs text-slate-500">📷 {question._count.images}</span>
+                  <span className="text-xs text-slate-400">📷 {question._count.images}</span>
                 )}
               </div>
-              <p className="mt-2 line-clamp-2 text-sm text-slate-400">{question.content}</p>
-              <p className="mt-3 text-xs text-slate-500">{formatDate(question.createdAt)}</p>
+              <p className="mt-2 line-clamp-2 text-sm text-slate-500">{question.content}</p>
+              <p className="mt-3 text-xs text-slate-400">{formatDate(question.createdAt)}</p>
             </Link>
           ))}
         </div>

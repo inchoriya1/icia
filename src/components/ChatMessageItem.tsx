@@ -26,7 +26,7 @@ export default function ChatMessageItem({
   onDelete,
 }: Props) {
   return (
-    <div className="group relative rounded-xl border border-white/5 bg-white/5 transition hover:border-violet-500/20">
+    <div className="group relative rounded-xl border border-slate-200 bg-white shadow-sm transition hover:border-violet-300">
       <button
         type="button"
         onClick={() => onCopy(message.content)}
@@ -34,16 +34,16 @@ export default function ChatMessageItem({
         title="클릭하여 복사"
       >
         <div className="mb-1.5 flex items-center justify-between gap-2">
-          <p className="text-xs font-medium text-violet-400">{formattedTime}</p>
+          <p className="text-xs font-medium text-violet-600">{formattedTime}</p>
           {copied ? (
-            <span className="text-xs font-medium text-emerald-400">복사됨!</span>
+            <span className="text-xs font-medium text-emerald-600">복사됨!</span>
           ) : (
-            <span className="text-xs text-slate-500 opacity-0 transition group-hover:opacity-100">
+            <span className="text-xs text-slate-400 opacity-0 transition group-hover:opacity-100">
               클릭하여 복사
             </span>
           )}
         </div>
-        <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-200">
+        <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
           {message.content}
         </p>
       </button>
@@ -53,7 +53,7 @@ export default function ChatMessageItem({
           type="button"
           onClick={() => onDelete(message.id)}
           disabled={deleting}
-          className="absolute right-3 top-3 rounded-lg bg-red-500/10 p-1.5 text-red-400 opacity-0 transition hover:bg-red-500/20 group-hover:opacity-100 disabled:opacity-50"
+          className="absolute right-3 top-3 rounded-lg bg-red-50 p-1.5 text-red-500 opacity-0 transition hover:bg-red-100 group-hover:opacity-100 disabled:opacity-50"
           title="삭제"
           aria-label="공지 삭제"
         >

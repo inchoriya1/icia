@@ -50,14 +50,14 @@ export default function MaterialUploadForm({ onSuccess }: Props) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-sm sm:p-8"
+      className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     >
-      <h1 className="text-2xl font-bold text-white">자료 업로드</h1>
-      <p className="mt-2 text-sm text-slate-400">새 강의 자료를 등록합니다.</p>
+      <h1 className="text-2xl font-bold text-slate-900">자료 업로드</h1>
+      <p className="mt-2 text-sm text-slate-500">새 강의 자료를 등록합니다.</p>
 
       <div className="mt-6 space-y-4">
         <div>
-          <label htmlFor="title" className="mb-1.5 block text-sm font-medium text-slate-300">
+          <label htmlFor="title" className="mb-1.5 block text-sm font-medium text-slate-700">
             제목
           </label>
           <input
@@ -65,24 +65,24 @@ export default function MaterialUploadForm({ onSuccess }: Props) {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-            className="w-full rounded-xl border border-white/10 bg-slate-900/50 px-4 py-3 text-white focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30"
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
             placeholder="자료 제목"
           />
         </div>
         <div>
-          <label htmlFor="description" className="mb-1.5 block text-sm font-medium text-slate-300">
+          <label htmlFor="description" className="mb-1.5 block text-sm font-medium text-slate-700">
             설명 (선택)
           </label>
           <input
             id="description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            className="w-full rounded-xl border border-white/10 bg-slate-900/50 px-4 py-3 text-white focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/30"
+            className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-slate-900 placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
             placeholder="간단한 설명"
           />
         </div>
         <div>
-          <label htmlFor="file" className="mb-1.5 block text-sm font-medium text-slate-300">
+          <label htmlFor="file" className="mb-1.5 block text-sm font-medium text-slate-700">
             파일
           </label>
           <input
@@ -90,20 +90,20 @@ export default function MaterialUploadForm({ onSuccess }: Props) {
             type="file"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             required
-            className="w-full text-sm text-slate-400 file:mr-4 file:rounded-lg file:border-0 file:bg-violet-600 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-violet-500"
+            className="w-full text-sm text-slate-500 file:mr-4 file:rounded-lg file:border-0 file:bg-violet-600 file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-violet-500"
           />
         </div>
       </div>
 
       {error && (
-        <p className="mt-4 rounded-lg bg-red-500/10 px-3 py-2 text-sm text-red-400">{error}</p>
+        <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{error}</p>
       )}
 
       <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <button
           type="button"
           onClick={() => router.push("/materials")}
-          className="rounded-xl border border-white/10 px-6 py-3 text-sm font-medium text-slate-300 transition hover:bg-white/5"
+          className="rounded-xl border border-slate-200 px-6 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
         >
           취소
         </button>

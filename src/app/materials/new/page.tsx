@@ -31,16 +31,16 @@ export default function NewMaterialPage() {
   if (!isInstructor) {
     return (
       <div className="mx-auto max-w-md px-4 py-16 text-center sm:py-24">
-        <p className="text-slate-400">자료 업로드는 강사만 이용할 수 있습니다.</p>
+        <p className="text-slate-500">자료 업로드는 강사만 이용할 수 있습니다.</p>
         <Link
           href="/admin"
-          className="mt-4 inline-block text-sm font-medium text-violet-400 hover:text-violet-300"
+          className="mt-4 inline-block text-sm font-medium text-violet-600 hover:text-violet-500"
         >
           /admin 에서 로그인
         </Link>
         <Link
           href="/materials"
-          className="mt-6 block text-sm text-slate-500 hover:text-slate-300"
+          className="mt-6 block text-sm text-slate-400 hover:text-slate-600"
         >
           목록으로
         </Link>
@@ -52,7 +52,7 @@ export default function NewMaterialPage() {
     <div className="mx-auto max-w-3xl px-4 py-12 sm:px-6">
       <Link
         href="/materials"
-        className="mb-6 inline-flex items-center gap-1 text-sm text-slate-400 transition hover:text-white"
+        className="mb-6 inline-flex items-center gap-1 text-sm text-slate-500 transition hover:text-slate-900"
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
