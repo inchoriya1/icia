@@ -64,7 +64,7 @@ export default function ChatAccordion() {
 
   useEffect(() => {
     if (listRef.current && expanded) {
-      listRef.current.scrollTop = listRef.current.scrollHeight;
+      listRef.current.scrollTop = 0;
     }
   }, [messages, expanded]);
 

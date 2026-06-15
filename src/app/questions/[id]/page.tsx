@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { FormEvent, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { formatDate } from "@/lib/utils";
@@ -12,6 +12,12 @@ type QuestionImage = {
   url: string | null;
 };
 
+type QuestionReply = {
+  id: string;
+  content: string;
+  createdAt: string;
+};
+
 type Question = {
   id: string;
   title: string;
@@ -20,13 +26,19 @@ type Question = {
   resolvedAt: string | null;
   createdAt: string;
   images: QuestionImage[];
+  replies: QuestionReply[];
 };
 
 export default function QuestionDetailPage() {
   const params = useParams<{ id: string }>();
   const [question, setQuestion] = useState<Question | null>(null);
+  const [isInstructor, setIsInstructor] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [replyContent, setReplyContent] = useState("");
+  const [replyLoading, setReplyLoading] = useState(false);
+  const [replyError, setReplyError] = useState("");
+  const [statusLoading, setStatusLoading] = useState(false);
 
   const fetchQuestion = useCallback(async () => {
     setLoading(true);
@@ -42,6 +54,7 @@ export default function QuestionDetailPage() {
       }
 
       setQuestion(data.question);
+      setIsInstructor(data.isInstructor === true);
     } catch {
       setError("네트워크 오류가 발생했습니다.");
     } finally {
@@ -52,6 +65,71 @@ export default function QuestionDetailPage() {
   useEffect(() => {
     fetchQuestion();
   }, [fetchQuestion]);
+
+  useEffect(() => {
+    const handler = () => fetchQuestion();
+    window.addEventListener("auth-changed", handler);
+    return () => window.removeEventListener("auth-changed", handler);
+  }, [fetchQuestion]);
+
+  async function handleToggleResolved() {
+    if (!question || !isInstructor || statusLoading) return;
+
+    setStatusLoading(true);
+    try {
+      const res = await fetch(`/api/questions/${params.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isResolved: !question.isResolved }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) return;
+
+      setQuestion((prev) =>
+        prev
+          ? {
+              ...prev,
+              isResolved: data.isResolved,
+              resolvedAt: data.resolvedAt ?? null,
+            }
+          : prev,
+      );
+    } finally {
+      setStatusLoading(false);
+    }
+  }
+
+  async function handleReply(e: FormEvent) {
+    e.preventDefault();
+    const trimmed = replyContent.trim();
+    if (!trimmed) return;
+
+    setReplyError("");
+    setReplyLoading(true);
+
+    try {
+      const res = await fetch(`/api/questions/${params.id}/replies`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content: trimmed }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setReplyError(data.error ?? "답글 등록에 실패했습니다.");
+        return;
+      }
+
+      setReplyContent("");
+      await fetchQuestion();
+    } catch {
+      setReplyError("네트워크 오류가 발생했습니다.");
+    } finally {
+      setReplyLoading(false);
+    }
+  }
 
   if (loading) {
     return (
@@ -93,22 +171,38 @@ export default function QuestionDetailPage() {
       >
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-2xl font-bold text-slate-900">{question.title}</h1>
-          <span
-            className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
-              question.isResolved
-                ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
-                : "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
-            }`}
-          >
-            {question.isResolved ? "해결됨" : "미해결"}
-          </span>
+          {isInstructor ? (
+            <button
+              type="button"
+              onClick={handleToggleResolved}
+              disabled={statusLoading}
+              title="클릭하여 상태 변경"
+              className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition hover:opacity-80 disabled:opacity-50 ${
+                question.isResolved
+                  ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
+                  : "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
+              }`}
+            >
+              {statusLoading ? "변경 중..." : question.isResolved ? "완료" : "미해결"}
+            </button>
+          ) : (
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                question.isResolved
+                  ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
+                  : "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
+              }`}
+            >
+              {question.isResolved ? "완료" : "미해결"}
+            </span>
+          )}
           <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500">익명</span>
         </div>
 
         <p className="mt-3 text-xs text-slate-400">
           {formatDate(question.createdAt)}
           {question.isResolved && question.resolvedAt && (
-            <> · 해결: {formatDate(question.resolvedAt)}</>
+            <> · 완료: {formatDate(question.resolvedAt)}</>
           )}
         </p>
 
@@ -142,6 +236,55 @@ export default function QuestionDetailPage() {
           </div>
         )}
       </article>
+
+      {question.replies.length > 0 && (
+        <section className="mt-6 space-y-3">
+          <h2 className="text-sm font-semibold text-slate-700">
+            답글 {question.replies.length}개
+          </h2>
+          {question.replies.map((reply) => (
+            <article
+              key={reply.id}
+              className="rounded-2xl border border-violet-200 bg-violet-50/50 p-5 shadow-sm"
+            >
+              <div className="mb-2 flex items-center gap-2">
+                <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-medium text-violet-700">
+                  강사
+                </span>
+                <span className="text-xs text-slate-400">{formatDate(reply.createdAt)}</span>
+              </div>
+              <p className="whitespace-pre-wrap text-sm leading-relaxed text-slate-700">
+                {reply.content}
+              </p>
+            </article>
+          ))}
+        </section>
+      )}
+
+      {isInstructor && (
+        <form onSubmit={handleReply} className="mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="text-sm font-semibold text-slate-900">답글 작성</h2>
+          <textarea
+            value={replyContent}
+            onChange={(e) => setReplyContent(e.target.value)}
+            rows={4}
+            placeholder="답글을 입력하세요..."
+            className="mt-3 w-full resize-none rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
+          />
+          {replyError && (
+            <p className="mt-2 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">{replyError}</p>
+          )}
+          <div className="mt-3 flex justify-end">
+            <button
+              type="submit"
+              disabled={replyLoading || !replyContent.trim()}
+              className="rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-violet-500 disabled:opacity-50"
+            >
+              {replyLoading ? "등록 중..." : "답글 등록"}
+            </button>
+          </div>
+        </form>
+      )}
     </div>
   );
 }

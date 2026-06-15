@@ -9,6 +9,7 @@ import {
 } from "@/lib/question-constants";
 import { prisma } from "@/lib/prisma";
 import { createAdminClient, QUESTION_IMAGES_BUCKET } from "@/lib/supabase";
+import { buildStoragePath } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -118,8 +119,7 @@ export async function POST(request: Request) {
   try {
     for (let i = 0; i < validImages.length; i++) {
       const file = validImages[i];
-      const safeName = file.name.replace(/[^\w.\-()가-힣]/g, "_");
-      const storagePath = `${questionId}/${i}-${safeName}`;
+      const storagePath = buildStoragePath(questionId, file.name, i);
       const buffer = Buffer.from(await file.arrayBuffer());
 
       const { error } = await supabase.storage

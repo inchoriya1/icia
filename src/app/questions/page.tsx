@@ -100,7 +100,7 @@ export default function QuestionsPage() {
                   : "bg-white text-slate-500 ring-1 ring-slate-200 hover:bg-slate-50"
               }`}
             >
-              {f === "all" ? "전체" : f === "open" ? "미해결" : "해결됨"}
+              {f === "all" ? "전체" : f === "open" ? "미해결" : "완료"}
             </button>
           ))}
         </div>
@@ -140,7 +140,7 @@ export default function QuestionsPage() {
                       : "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
                   }`}
                 >
-                  {question.isResolved ? "해결됨" : "미해결"}
+                  {question.isResolved ? "완료" : "미해결"}
                 </span>
                 {question._count.images > 0 && (
                   <span className="text-xs text-slate-400">📷 {question._count.images}</span>

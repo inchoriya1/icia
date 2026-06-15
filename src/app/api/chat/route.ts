@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   const { data: messages, dbUnavailable } = await withDbFallback(
     [],
-    () => prisma.chatMessage.findMany({ orderBy: { createdAt: "asc" } }),
+    () => prisma.chatMessage.findMany({ orderBy: { createdAt: "desc" } }),
   );
 
   return NextResponse.json({

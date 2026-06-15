@@ -14,7 +14,10 @@ export async function GET(_request: Request, context: RouteContext) {
   const { data: question, dbUnavailable } = await withDbFallback(null, async () => {
     const result = await prisma.question.findUnique({
       where: { id },
-      include: { images: { orderBy: { sortOrder: "asc" } } },
+      include: {
+        images: { orderBy: { sortOrder: "asc" } },
+        replies: { orderBy: { createdAt: "asc" } },
+      },
     });
 
     if (!result) return null;

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 
 type NavLink = { href: string; label: string };
@@ -16,12 +17,17 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <a href="/" className="group flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 text-sm font-bold text-white shadow-lg shadow-violet-500/25">
-            L
-          </span>
+        <a href="/" className="group flex items-center gap-2.5">
+          <Image
+            src="/logo.png"
+            alt="인천일보아카데미"
+            width={36}
+            height={36}
+            className="h-9 w-9 rounded-xl object-contain"
+            priority
+          />
           <span className="text-lg font-semibold tracking-tight text-slate-900">
-            Lecture<span className="text-violet-600">Hub</span>
+            인천일보<span className="text-violet-600">아카데미</span>
           </span>
         </a>
 

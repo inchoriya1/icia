@@ -3,6 +3,7 @@ import { isInstructor } from "@/lib/auth";
 import { withDbFallback } from "@/lib/db-error";
 import { prisma } from "@/lib/prisma";
 import { createAdminClient, MATERIALS_BUCKET } from "@/lib/supabase";
+import { buildStoragePath } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -38,8 +39,7 @@ export async function POST(request: Request) {
   }
 
   const id = crypto.randomUUID();
-  const safeName = file.name.replace(/[^\w.\-()가-힣]/g, "_");
-  const storagePath = `${id}/${safeName}`;
+  const storagePath = buildStoragePath(id, file.name);
 
   const supabase = createAdminClient();
   const buffer = Buffer.from(await file.arrayBuffer());

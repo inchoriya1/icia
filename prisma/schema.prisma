@@ -32,6 +32,15 @@ model Question {
   resolvedAt DateTime?
   createdAt  DateTime        @default(now())
   images     QuestionImage[]
+  replies    QuestionReply[]
+}
+
+model QuestionReply {
+  id         String   @id @default(cuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  content    String
+  createdAt  DateTime @default(now())
 }
 
 model QuestionImage {
