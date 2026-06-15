@@ -31,17 +31,20 @@ const features = [
 export default function HomePage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
-      <section className="text-center">
+      <section className="mx-auto max-w-4xl text-center">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-4 py-1.5 text-sm font-medium text-violet-700">
           <span className="h-1.5 w-1.5 rounded-full bg-violet-500" />
           2026 Summer Lecture
         </div>
 
-        <h1 className="bg-gradient-to-br from-slate-900 via-violet-700 to-indigo-600 bg-clip-text text-4xl font-bold tracking-tight text-transparent sm:text-6xl">
-          AI 사무자동화
-          <br />
-          실무 전문가 과정
+        <h1 className="bg-gradient-to-br from-slate-900 via-violet-700 to-indigo-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-5xl">
+          AI 사무자동화 실무 전문가 과정
         </h1>
+
+        <p className="mt-4 text-base font-medium text-slate-600 sm:text-xl">
+          AI 문서 자동화를 위한 베이직
+        </p>
+
       </section>
 
       <section className="mt-20 grid gap-6 sm:grid-cols-2">
