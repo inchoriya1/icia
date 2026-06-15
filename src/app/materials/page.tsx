@@ -17,6 +17,7 @@ export default function MaterialsPage() {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [isInstructor, setIsInstructor] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const fetchMaterials = useCallback(async () => {
     setLoading(true);
@@ -40,6 +41,21 @@ export default function MaterialsPage() {
     window.addEventListener("auth-changed", handler);
     return () => window.removeEventListener("auth-changed", handler);
   }, [fetchMaterials]);
+
+  async function handleDelete(id: string, title: string) {
+    if (!confirm(`「${title}」 자료를 삭제할까요?`)) return;
+
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/materials/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        await fetchMaterials();
+        window.dispatchEvent(new Event("auth-changed"));
+      }
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
@@ -96,15 +112,35 @@ export default function MaterialsPage() {
                   </div>
                 </div>
               </div>
-              <a
-                href={`/api/materials/${material.id}/download`}
-                className="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-violet-500"
-              >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
-                다운로드
-              </a>
+              <div className="flex shrink-0 flex-wrap items-center gap-2">
+                <a
+                  href={`/api/materials/${material.id}/download`}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-violet-500"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                  </svg>
+                  다운로드
+                </a>
+                {isInstructor && (
+                  <>
+                    <Link
+                      href={`/materials/${material.id}/edit`}
+                      className="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-50"
+                    >
+                      수정
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(material.id, material.title)}
+                      disabled={deletingId === material.id}
+                      className="inline-flex items-center justify-center rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+                    >
+                      {deletingId === material.id ? "삭제 중..." : "삭제"}
+                    </button>
+                  </>
+                )}
+              </div>
             </article>
           ))}
         </div>

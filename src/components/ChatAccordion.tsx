@@ -137,7 +137,7 @@ export default function ChatAccordion() {
       return;
     }
 
-    if (!confirm(`공지 ${messages.length}개를 자료실로보낼까요?\n(각 공지가 제목과 함께 텍스트 파일로 등록됩니다)`)) {
+    if (!confirm(`공지 ${messages.length}개를 자료실로보낼까요?\n(모든 공지가 하나의 텍스트 파일로 등록됩니다)`)) {
       return;
     }
 
@@ -154,7 +154,7 @@ export default function ChatAccordion() {
         return;
       }
 
-      setActionMessage(`${data.count}개 공지를 자료실에 등록했습니다.`);
+      setActionMessage(`공지 ${data.messageCount}개를 하나의 자료로 등록했습니다.`);
       window.dispatchEvent(new Event("auth-changed"));
     } catch {
       setActionError("네트워크 오류가 발생했습니다.");

@@ -1,9 +1,8 @@
 import { NextResponse } from "next/server";
 import { isInstructor } from "@/lib/auth";
-import { chatMessageFileName, chatMessageTitle } from "@/lib/chat-export";
+import { buildChatExportBundle } from "@/lib/chat-export";
 import { createMaterialFromBuffer } from "@/lib/materials";
 import { prisma } from "@/lib/prisma";
-import { formatDate } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -20,33 +19,24 @@ export async function POST() {
     return NextResponse.json({ error: "보낼 공지가 없습니다." }, { status: 400 });
   }
 
-  const materials = [];
+  const { title, description, fileName, content } = buildChatExportBundle(messages);
 
   try {
-    for (const message of messages) {
-      const createdAt = message.createdAt;
-      const title = chatMessageTitle(message.content, createdAt);
-      const fileName = chatMessageFileName(title, createdAt);
-      const description = `채팅 공지에서보냄 · ${formatDate(createdAt.toISOString())}`;
-      const buffer = Buffer.from(message.content, "utf-8");
+    const material = await createMaterialFromBuffer({
+      title,
+      description,
+      fileName,
+      buffer: Buffer.from(content, "utf-8"),
+      contentType: "text/plain; charset=utf-8",
+    });
 
-      const material = await createMaterialFromBuffer({
-        title,
-        description,
-        fileName,
-        buffer,
-        contentType: "text/plain; charset=utf-8",
-      });
-
-      materials.push(material);
-    }
+    return NextResponse.json({
+      count: 1,
+      messageCount: messages.length,
+      material,
+    });
   } catch (error) {
     const message = error instanceof Error ? error.message : "보내기에 실패했습니다.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
-
-  return NextResponse.json({
-    count: materials.length,
-    materials,
-  });
 }
