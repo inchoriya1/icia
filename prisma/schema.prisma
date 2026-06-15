@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model Material {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  fileName    String
+  storagePath String
+  fileSize    Int?
+  createdAt   DateTime @default(now())
+}
+
+model Question {
+  id         String          @id @default(cuid())
+  title      String
+  content    String
+  isResolved Boolean         @default(false)
+  resolvedAt DateTime?
+  createdAt  DateTime        @default(now())
+  images     QuestionImage[]
+}
+
+model QuestionImage {
+  id          String   @id @default(cuid())
+  questionId  String
+  question    Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  fileName    String
+  storagePath String
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+}

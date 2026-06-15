@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LectureHub
 
-## Getting Started
+Vercel + Supabase 기반 강의 사이트입니다.
 
-First, run the development server:
+## 기능
+
+- **플로팅 채팅** — 우측 하단에 항상 표시, 강사만 작성 (비밀번호 + 세션)
+- **채팅 복사** — 수강생은 전체 내용 복사 가능
+- **자료실** — Supabase Storage에 파일 저장, 다운로드 제공
+- **질문게시판** — 익명 작성, 강사가 해결 여부 체크
+
+## 시작하기
+
+### 1. Supabase 설정
+
+1. [Supabase](https://supabase.com)에서 프로젝트 생성
+2. **Storage** → 새 버킷 `materials` 생성 (Private 권장)
+3. **Settings → Database**에서 Connection string 복사
+   - `DATABASE_URL`: Transaction pooler (포트 6543)
+   - `DIRECT_URL`: Direct connection (포트 5432)
+4. **Settings → API**에서 URL, anon key, service_role key 복사
+
+### 2. 환경 변수
+
+```bash
+cp .env.example .env
+```
+
+`.env` 파일을 Supabase·강사 비밀번호 값으로 채웁니다.
+
+### 3. DB 마이그레이션
+
+```bash
+npm install
+npx prisma migrate dev --name init
+```
+
+### 4. 로컬 실행
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+http://localhost:3000 에서 확인
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Vercel 배포
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. GitHub에 push
+2. Vercel에서 프로젝트 import
+3. Environment Variables에 `.env.example` 항목 모두 등록
+4. Deploy
+5. 배포 후 로컬 또는 CI에서:
 
-## Learn More
+```bash
+npx prisma migrate deploy
+```
 
-To learn more about Next.js, take a look at the following resources:
+## 강사 사용법
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. 상단 **강사 로그인** 클릭
+2. `INSTRUCTOR_PASSWORD` 입력 (한 번만, 세션 유지)
+3. 채팅 작성, 자료 업로드, 질문 해결 처리 가능
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 기술 스택
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Next.js 16 (App Router, TypeScript)
+- Tailwind CSS 4
+- Prisma + Supabase PostgreSQL
+- Supabase Storage
+- iron-session
