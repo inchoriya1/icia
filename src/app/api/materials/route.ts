@@ -2,8 +2,7 @@ import { NextResponse } from "next/server";
 import { isInstructor } from "@/lib/auth";
 import { withDbFallback } from "@/lib/db-error";
 import { prisma } from "@/lib/prisma";
-import { createAdminClient, MATERIALS_BUCKET } from "@/lib/supabase";
-import { buildStoragePath } from "@/lib/utils";
+import { createMaterialFromBuffer } from "@/lib/materials";
 
 export const dynamic = "force-dynamic";
 
@@ -41,33 +40,18 @@ export async function POST(request: Request) {
   const id = crypto.randomUUID();
   const storagePath = buildStoragePath(id, file.name);
 
-  const supabase = createAdminClient();
-  const buffer = Buffer.from(await file.arrayBuffer());
-
-  const { error: uploadError } = await supabase.storage
-    .from(MATERIALS_BUCKET)
-    .upload(storagePath, buffer, {
-      contentType: file.type || "application/octet-stream",
-      upsert: false,
-    });
-
-  if (uploadError) {
-    return NextResponse.json(
-      { error: `업로드 실패: ${uploadError.message}` },
-      { status: 500 },
-    );
-  }
-
-  const material = await prisma.material.create({
-    data: {
-      id,
+  try {
+    const material = await createMaterialFromBuffer({
       title,
       description,
       fileName: file.name,
-      storagePath,
-      fileSize: file.size,
-    },
-  });
+      buffer: Buffer.from(await file.arrayBuffer()),
+      contentType: file.type || "application/octet-stream",
+    });
 
-  return NextResponse.json(material, { status: 201 });
+    return NextResponse.json(material, { status: 201 });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "업로드에 실패했습니다.";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }

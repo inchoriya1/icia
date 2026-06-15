@@ -36,3 +36,12 @@ export async function POST(request: Request) {
 
   return NextResponse.json(message, { status: 201 });
 }
+
+export async function DELETE() {
+  if (!(await isInstructor())) {
+    return NextResponse.json({ error: "강사만 삭제할 수 있습니다." }, { status: 401 });
+  }
+
+  const { count } = await prisma.chatMessage.deleteMany();
+  return NextResponse.json({ ok: true, count });
+}

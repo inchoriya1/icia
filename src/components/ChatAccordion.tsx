@@ -23,6 +23,10 @@ export default function ChatAccordion() {
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [polling, setPolling] = useState(true);
   const [loaded, setLoaded] = useState(false);
+  const [exportLoading, setExportLoading] = useState(false);
+  const [deleteAllLoading, setDeleteAllLoading] = useState(false);
+  const [actionMessage, setActionMessage] = useState("");
+  const [actionError, setActionError] = useState("");
   const listRef = useRef<HTMLDivElement>(null);
 
   const fetchMessages = useCallback(async () => {
@@ -126,6 +130,66 @@ export default function ChatAccordion() {
     window.dispatchEvent(new Event("auth-changed"));
   }
 
+  async function handleExportToMaterials() {
+    if (messages.length === 0) {
+      setActionError("보낼 공지가 없습니다.");
+      setActionMessage("");
+      return;
+    }
+
+    if (!confirm(`공지 ${messages.length}개를 자료실로보낼까요?\n(각 공지가 제목과 함께 텍스트 파일로 등록됩니다)`)) {
+      return;
+    }
+
+    setActionError("");
+    setActionMessage("");
+    setExportLoading(true);
+
+    try {
+      const res = await fetch("/api/chat/export", { method: "POST" });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setActionError(data.error ?? "보내기에 실패했습니다.");
+        return;
+      }
+
+      setActionMessage(`${data.count}개 공지를 자료실에 등록했습니다.`);
+      window.dispatchEvent(new Event("auth-changed"));
+    } catch {
+      setActionError("네트워크 오류가 발생했습니다.");
+    } finally {
+      setExportLoading(false);
+    }
+  }
+
+  async function handleDeleteAll() {
+    if (messages.length === 0) return;
+    if (!confirm("모든 공지를 삭제할까요? 이 작업은 되돌릴 수 없습니다.")) return;
+
+    setActionError("");
+    setActionMessage("");
+    setDeleteAllLoading(true);
+
+    try {
+      const res = await fetch("/api/chat", { method: "DELETE" });
+      const data = await res.json();
+
+      if (!res.ok) {
+        setActionError(data.error ?? "삭제에 실패했습니다.");
+        return;
+      }
+
+      setActionMessage(`공지 ${data.count}개를 삭제했습니다.`);
+      await fetchMessages();
+      window.dispatchEvent(new Event("auth-changed"));
+    } catch {
+      setActionError("네트워크 오류가 발생했습니다.");
+    } finally {
+      setDeleteAllLoading(false);
+    }
+  }
+
   return (
     <section className="mt-16 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       <button
@@ -183,6 +247,37 @@ export default function ChatAccordion() {
                 ))
               )}
             </div>
+
+            {isInstructor && messages.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={handleExportToMaterials}
+                  disabled={exportLoading || deleteAllLoading}
+                  className="rounded-lg border border-violet-200 bg-violet-50 px-3 py-1.5 text-xs font-medium text-violet-700 transition hover:bg-violet-100 disabled:opacity-50"
+                >
+                  {exportLoading ? "보내는 중..." : "자료실로보내기"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeleteAll}
+                  disabled={exportLoading || deleteAllLoading}
+                  className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-100 disabled:opacity-50"
+                >
+                  {deleteAllLoading ? "삭제 중..." : "채팅 전체 삭제"}
+                </button>
+              </div>
+            )}
+
+            {(actionMessage || actionError) && (
+              <p
+                className={`mt-3 rounded-lg px-3 py-2 text-sm ${
+                  actionError ? "bg-red-50 text-red-600" : "bg-emerald-50 text-emerald-600"
+                }`}
+              >
+                {actionError || actionMessage}
+              </p>
+            )}
 
             {isInstructor && (
               <form onSubmit={handleSend} className="mt-4 space-y-3">
