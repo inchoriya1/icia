@@ -37,9 +37,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "파일을 선택해 주세요." }, { status: 400 });
   }
 
-  const id = crypto.randomUUID();
-  const storagePath = buildStoragePath(id, file.name);
-
   try {
     const material = await createMaterialFromBuffer({
       title,
