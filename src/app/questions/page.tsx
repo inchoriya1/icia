@@ -1,58 +1,27 @@
-"use client";
-
-import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import Pagination from "@/components/Pagination";
 import { formatDate } from "@/lib/utils";
+import {
+  fetchQuestionsPage,
+  parseQuestionStatus,
+  parseQuestionsPage,
+  questionsListHref,
+} from "@/lib/questions-list";
 
-type QuestionListItem = {
-  id: string;
-  title: string;
-  content: string;
-  isResolved: boolean;
-  resolvedAt: string | null;
-  createdAt: string;
-  _count: { images: number };
+type Props = {
+  searchParams: Promise<{ page?: string; status?: string; q?: string }>;
 };
 
-export default function QuestionsPage() {
-  const [questions, setQuestions] = useState<QuestionListItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchInput, setSearchInput] = useState("");
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState<"all" | "open" | "resolved">("all");
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
-  const [total, setTotal] = useState(0);
+export default async function QuestionsPage({ searchParams }: Props) {
+  const params = await searchParams;
+  const filters = {
+    page: parseQuestionsPage(params.page),
+    status: parseQuestionStatus(params.status),
+    q: params.q?.trim() ?? "",
+  };
 
-  const fetchQuestions = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({
-        page: String(page),
-        status: filter,
-      });
-      if (search) params.set("q", search);
-
-      const res = await fetch(`/api/questions?${params}`);
-      const data = await res.json();
-      setQuestions(data.questions ?? []);
-      setTotalPages(data.totalPages ?? 0);
-      setTotal(data.total ?? 0);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, filter, search]);
-
-  useEffect(() => {
-    fetchQuestions();
-  }, [fetchQuestions]);
-
-  function handleSearch(e: React.FormEvent) {
-    e.preventDefault();
-    setPage(1);
-    setSearch(searchInput.trim());
-  }
+  const { data } = await fetchQuestionsPage(filters);
+  const { questions, total, page, totalPages } = data;
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6">
@@ -69,10 +38,11 @@ export default function QuestionsPage() {
         </Link>
       </div>
 
-      <form onSubmit={handleSearch} className="mb-4 flex gap-2">
+      <form method="get" action="/questions" className="mb-4 flex gap-2">
+        <input type="hidden" name="status" value={filters.status} />
         <input
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
+          name="q"
+          defaultValue={filters.q}
           placeholder="제목·내용 검색"
           className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:border-violet-400 focus:outline-none focus:ring-2 focus:ring-violet-200"
         />
@@ -86,37 +56,28 @@ export default function QuestionsPage() {
 
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div className="flex gap-2">
-          {(["all", "open", "resolved"] as const).map((f) => (
-            <button
-              key={f}
-              type="button"
-              onClick={() => {
-                setFilter(f);
-                setPage(1);
-              }}
+          {(["all", "open", "resolved"] as const).map((status) => (
+            <Link
+              key={status}
+              href={questionsListHref({ page: 1, status, q: filters.q })}
+              prefetch
               className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-                filter === f
+                filters.status === status
                   ? "bg-violet-600 text-white shadow-sm"
                   : "bg-white text-slate-500 ring-1 ring-slate-200 hover:bg-slate-50"
               }`}
             >
-              {f === "all" ? "전체" : f === "open" ? "미해결" : "완료"}
-            </button>
+              {status === "all" ? "전체" : status === "open" ? "미해결" : "완료"}
+            </Link>
           ))}
         </div>
         <p className="text-sm text-slate-400">총 {total}건</p>
       </div>
 
-      {loading ? (
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-28 animate-pulse rounded-2xl bg-slate-200/60" />
-          ))}
-        </div>
-      ) : questions.length === 0 ? (
+      {questions.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-slate-300 py-16 text-center">
           <p className="text-slate-400">
-            {search ? "검색 결과가 없습니다." : "등록된 질문이 없습니다."}
+            {filters.q ? "검색 결과가 없습니다." : "등록된 질문이 없습니다."}
           </p>
         </div>
       ) : (
@@ -125,6 +86,7 @@ export default function QuestionsPage() {
             <Link
               key={question.id}
               href={`/questions/${question.id}`}
+              prefetch
               className={`block rounded-2xl border p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-300 hover:shadow-lg hover:shadow-violet-100 ${
                 question.isResolved
                   ? "border-emerald-200 bg-emerald-50/60"
@@ -156,7 +118,7 @@ export default function QuestionsPage() {
       <Pagination
         page={page}
         totalPages={totalPages}
-        onPageChange={(next) => setPage(next)}
+        hrefForPage={(p) => questionsListHref({ ...filters, page: p })}
       />
     </div>
   );

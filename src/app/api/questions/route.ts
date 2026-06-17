@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
 import { isInstructor } from "@/lib/auth";
-import { withDbFallback } from "@/lib/db-error";
 import { attachImageUrls } from "@/lib/questions";
+import {
+  fetchQuestionsPage,
+  parseQuestionStatus,
+  parseQuestionsPage,
+} from "@/lib/questions-list";
 import {
   ALLOWED_IMAGE_TYPES,
   MAX_QUESTION_IMAGES,
@@ -13,66 +16,15 @@ import { buildStoragePath } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
-const PAGE_SIZE = 10;
-
-function buildWhere(
-  search: string,
-  status: string,
-): Prisma.QuestionWhereInput {
-  const conditions: Prisma.QuestionWhereInput[] = [];
-
-  if (status === "open") {
-    conditions.push({ isResolved: false });
-  } else if (status === "resolved") {
-    conditions.push({ isResolved: true });
-  }
-
-  if (search) {
-    conditions.push({
-      OR: [
-        { title: { contains: search, mode: "insensitive" } },
-        { content: { contains: search, mode: "insensitive" } },
-      ],
-    });
-  }
-
-  return conditions.length > 0 ? { AND: conditions } : {};
-}
-
 export async function GET(request: NextRequest) {
   const { searchParams } = request.nextUrl;
-  const search = searchParams.get("q")?.trim() ?? "";
-  const status = searchParams.get("status") ?? "all";
-  const page = Math.max(1, Number(searchParams.get("page") ?? "1") || 1);
-  const where = buildWhere(search, status);
-  const skip = (page - 1) * PAGE_SIZE;
+  const filters = {
+    page: parseQuestionsPage(searchParams.get("page") ?? undefined),
+    status: parseQuestionStatus(searchParams.get("status") ?? undefined),
+    q: searchParams.get("q")?.trim() ?? "",
+  };
 
-  const { data, dbUnavailable } = await withDbFallback(
-    { questions: [], total: 0, page, pageSize: PAGE_SIZE, totalPages: 0 },
-    async () => {
-      const [questions, total] = await Promise.all([
-        prisma.question.findMany({
-          where,
-          orderBy: { createdAt: "desc" },
-          skip,
-          take: PAGE_SIZE,
-          include: {
-            images: { orderBy: { sortOrder: "asc" }, take: 1 },
-            _count: { select: { images: true } },
-          },
-        }),
-        prisma.question.count({ where }),
-      ]);
-
-      return {
-        questions,
-        total,
-        page,
-        pageSize: PAGE_SIZE,
-        totalPages: Math.ceil(total / PAGE_SIZE) || 0,
-      };
-    },
-  );
+  const { data, dbUnavailable } = await fetchQuestionsPage(filters);
 
   return NextResponse.json({
     ...data,

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { isInstructor } from "@/lib/auth";
-import { withDbFallback } from "@/lib/db-error";
-import { attachImageUrls } from "@/lib/questions";
+import { fetchQuestionById } from "@/lib/questions";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -10,19 +9,7 @@ type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(_request: Request, context: RouteContext) {
   const { id } = await context.params;
-
-  const { data: question, dbUnavailable } = await withDbFallback(null, async () => {
-    const result = await prisma.question.findUnique({
-      where: { id },
-      include: {
-        images: { orderBy: { sortOrder: "asc" } },
-        replies: { orderBy: { createdAt: "asc" } },
-      },
-    });
-
-    if (!result) return null;
-    return attachImageUrls(result);
-  });
+  const { data: question, dbUnavailable } = await fetchQuestionById(id);
 
   if (dbUnavailable) {
     return NextResponse.json({ error: "DB 연결에 실패했습니다." }, { status: 503 });

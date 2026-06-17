@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import AuthRefresh from "@/components/AuthRefresh";
 import Navbar from "@/components/Navbar";
 import "./globals.css";
 
@@ -37,6 +38,7 @@ export default function RootLayout({
         </div>
 
         <div className="relative flex min-h-full flex-col">
+          <AuthRefresh />
           <Navbar />
           <main className="flex-1">{children}</main>
           <footer className="border-t border-slate-200/80 py-8 text-center text-sm text-slate-400">

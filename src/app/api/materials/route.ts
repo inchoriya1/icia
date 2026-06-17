@@ -1,19 +1,20 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { isInstructor } from "@/lib/auth";
-import { withDbFallback } from "@/lib/db-error";
-import { prisma } from "@/lib/prisma";
+import {
+  fetchMaterialsPage,
+  parseMaterialsPage,
+} from "@/lib/materials-list";
 import { createMaterialFromBuffer } from "@/lib/materials";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  const { data: materials, dbUnavailable } = await withDbFallback(
-    [],
-    () => prisma.material.findMany({ orderBy: { createdAt: "desc" } }),
-  );
+export async function GET(request: NextRequest) {
+  const { searchParams } = request.nextUrl;
+  const page = parseMaterialsPage(searchParams.get("page") ?? undefined);
+  const { data, dbUnavailable } = await fetchMaterialsPage(page);
 
   return NextResponse.json({
-    materials,
+    ...data,
     isInstructor: await isInstructor(),
     dbUnavailable,
   });
