@@ -121,6 +121,7 @@ export default function QuestionDetailView({ question: initial, isInstructor }: 
       >
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-2xl font-bold text-slate-900">{question.title}</h1>
+          {isInstructor ? (
             <div className="flex items-center gap-2">
               <button
                 type="button"
