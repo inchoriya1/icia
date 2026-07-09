@@ -18,6 +18,7 @@ export default function QuestionDetailView({ question: initial, isInstructor }: 
   const [replyLoading, setReplyLoading] = useState(false);
   const [replyError, setReplyError] = useState("");
   const [statusLoading, setStatusLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   async function handleToggleResolved() {
     if (!isInstructor || statusLoading) return;
@@ -40,6 +41,31 @@ export default function QuestionDetailView({ question: initial, isInstructor }: 
       }));
     } finally {
       setStatusLoading(false);
+    }
+  }
+
+  async function handleDelete() {
+    if (!isInstructor || deleteLoading) return;
+    if (!confirm("정말 이 질문을 삭제하시겠습니까? 관련 이미지와 답글도 모두 삭제됩니다.")) return;
+
+    setDeleteLoading(true);
+    try {
+      const res = await fetch(`/api/questions/${question.id}`, {
+        method: "DELETE",
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        alert(data.error ?? "삭제에 실패했습니다.");
+        setDeleteLoading(false);
+        return;
+      }
+
+      router.push("/questions");
+      router.refresh();
+    } catch {
+      alert("네트워크 오류가 발생했습니다.");
+      setDeleteLoading(false);
     }
   }
 
@@ -95,20 +121,29 @@ export default function QuestionDetailView({ question: initial, isInstructor }: 
       >
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-2xl font-bold text-slate-900">{question.title}</h1>
-          {isInstructor ? (
-            <button
-              type="button"
-              onClick={handleToggleResolved}
-              disabled={statusLoading}
-              title="클릭하여 상태 변경"
-              className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition hover:opacity-80 disabled:opacity-50 ${
-                question.isResolved
-                  ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
-                  : "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
-              }`}
-            >
-              {statusLoading ? "변경 중..." : question.isResolved ? "완료" : "미해결"}
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleToggleResolved}
+                disabled={statusLoading || deleteLoading}
+                title="클릭하여 상태 변경"
+                className={`rounded-full px-2.5 py-0.5 text-xs font-medium transition hover:opacity-80 disabled:opacity-50 ${
+                  question.isResolved
+                    ? "bg-emerald-50 text-emerald-600 ring-1 ring-emerald-200"
+                    : "bg-amber-50 text-amber-600 ring-1 ring-amber-200"
+                }`}
+              >
+                {statusLoading ? "변경 중..." : question.isResolved ? "완료" : "미해결"}
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={statusLoading || deleteLoading}
+                className="rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-medium text-red-600 ring-1 ring-red-200 transition hover:bg-red-100 disabled:opacity-50"
+              >
+                {deleteLoading ? "삭제 중..." : "삭제"}
+              </button>
+            </div>
           ) : (
             <span
               className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${

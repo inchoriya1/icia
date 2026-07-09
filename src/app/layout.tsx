@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "인천일보아카데미 | 강의사이트",
+  title: "K-뉴딜아카데미 | 강의사이트",
   description: "강의 자료, 질문게시판, 실시간 공지 채팅",
   icons: {
     icon: "/logo.png",
@@ -42,7 +42,7 @@ export default function RootLayout({
           <Navbar />
           <main className="flex-1">{children}</main>
           <footer className="border-t border-slate-200/80 py-8 text-center text-sm text-slate-400">
-            인천일보아카데미 · 강의 자료 &amp; 질문게시판
+            K-뉴딜아카데미 · 강의 자료 &amp; 질문게시판
           </footer>
         </div>
       </body>

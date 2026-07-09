@@ -82,3 +82,26 @@ export async function fetchQuestionById(id: string) {
     };
   });
 }
+
+export async function deleteQuestion(id: string) {
+  const existing = await prisma.question.findUnique({
+    where: { id },
+    include: { images: true },
+  });
+
+  if (!existing) {
+    throw new Error("질문을 찾을 수 없습니다.");
+  }
+
+  if (existing.images.length > 0) {
+    const supabase = createAdminClient();
+    const paths = existing.images.map((img) => img.storagePath);
+    const { error } = await supabase.storage.from(QUESTION_IMAGES_BUCKET).remove(paths);
+    if (error) {
+      console.error("Failed to delete question images:", error);
+      // We can proceed to delete the question anyway, or throw
+    }
+  }
+
+  await prisma.question.delete({ where: { id } });
+}

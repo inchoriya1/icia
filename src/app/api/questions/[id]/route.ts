@@ -47,3 +47,21 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   return NextResponse.json(question);
 }
+
+export async function DELETE(_request: Request, context: RouteContext) {
+  if (!(await isInstructor())) {
+    return NextResponse.json({ error: "강사만 삭제할 수 있습니다." }, { status: 401 });
+  }
+
+  const { id } = await context.params;
+
+  try {
+    const { deleteQuestion } = await import("@/lib/questions");
+    await deleteQuestion(id);
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "삭제에 실패했습니다.";
+    const status = message.includes("찾을 수 없습니다") ? 404 : 500;
+    return NextResponse.json({ error: message }, { status });
+  }
+}

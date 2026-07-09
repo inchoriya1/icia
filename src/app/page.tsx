@@ -38,11 +38,11 @@ export default function HomePage() {
         </div>
 
         <h1 className="bg-gradient-to-br from-slate-900 via-violet-700 to-indigo-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-5xl">
-          AI 사무자동화 실무 전문가 과정
+          AI Growth Marketer(AGM) 양성과정
         </h1>
 
         <p className="mt-4 text-base font-medium text-slate-600 sm:text-xl">
-          AI 문서 자동화를 위한 베이직
+          한남대학교
         </p>
 
       </section>
