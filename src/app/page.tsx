@@ -34,15 +34,15 @@ export default function HomePage() {
       <section className="mx-auto max-w-4xl text-center">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-4 py-1.5 text-sm font-medium text-violet-700">
           <span className="h-1.5 w-1.5 rounded-full bg-violet-500" />
-          2026 Summer Lecture
+          2026 Fall Lecture
         </div>
 
         <h1 className="bg-gradient-to-br from-slate-900 via-violet-700 to-indigo-600 bg-clip-text text-3xl font-bold tracking-tight text-transparent sm:text-5xl">
-          AI Growth Marketer(AGM) 양성과정
+          ChatGPT 기반 AI 업무활용 실무교육
         </h1>
 
         <p className="mt-4 text-base font-medium text-slate-600 sm:text-xl">
-          한남대학교
+          한국미우라공업 주식회사
         </p>
 
       </section>
