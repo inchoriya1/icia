@@ -32,14 +32,14 @@ export default function Navbar() {
         <Link href="/" className="group flex items-center gap-2.5" prefetch>
           <Image
             src="/logo.png"
-            alt="인천일보아카데미"
+            alt="AI 업무활용 실무교육"
             width={36}
             height={36}
             className="h-9 w-9 rounded-xl object-contain"
             priority
           />
           <span className="text-lg font-semibold tracking-tight text-slate-900">
-            인천일보<span className="text-violet-600">아카데미</span>
+            AI 업무활용 <span className="text-violet-600">실무교육</span>
           </span>
         </Link>
 
