@@ -60,6 +60,7 @@ npx prisma migrate deploy
 1. 상단 **강사 로그인** 클릭
 2. `INSTRUCTOR_PASSWORD` 입력 (한 번만, 세션 유지)
 3. 채팅 작성, 자료 업로드, 질문 해결 처리 가능
+4. `/admin` → **사이트 정보**에서 사이트명·배지·과정명·부제를 수정하면 바로 반영 (Supabase Storage `materials/_site/settings.json`에 저장, DB 마이그레이션 불필요)
 
 ## 기술 스택
 

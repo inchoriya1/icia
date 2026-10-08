@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import AuthRefresh from "@/components/AuthRefresh";
 import Navbar from "@/components/Navbar";
+import { getSiteSettings, splitSiteName } from "@/lib/site-settings";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,20 +15,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "AI 업무활용 실무교육 | 강의사이트",
-  description: "강의 자료, 질문게시판, 실시간 공지 채팅",
-  icons: {
-    icon: "/logo.png",
-    apple: "/logo.png",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSiteSettings();
 
-export default function RootLayout({
+  return {
+    title: `${settings.siteName} | 강의사이트`,
+    description: "강의 자료, 질문게시판, 실시간 공지 채팅",
+    icons: {
+      icon: "/logo.png",
+      apple: "/logo.png",
+    },
+  };
+}
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const settings = await getSiteSettings();
+  const { lead, accent } = splitSiteName(settings);
+
   return (
     <html lang="ko" className={`${geistSans.variable} ${geistMono.variable} h-full`}>
       <body className="min-h-full bg-slate-50 text-slate-900 antialiased">
@@ -39,10 +47,10 @@ export default function RootLayout({
 
         <div className="relative flex min-h-full flex-col">
           <AuthRefresh />
-          <Navbar />
+          <Navbar siteName={settings.siteName} nameLead={lead} nameAccent={accent} />
           <main className="flex-1">{children}</main>
           <footer className="border-t border-slate-200/80 py-8 text-center text-sm text-slate-400">
-            AI 업무활용 실무교육 · 강의 자료 &amp; 질문게시판
+            {settings.siteName} · 강의 자료 &amp; 질문게시판
           </footer>
         </div>
       </body>

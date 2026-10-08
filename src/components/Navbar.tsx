@@ -13,7 +13,13 @@ const links: NavLink[] = [
   { href: "/questions", label: "질문게시판" },
 ];
 
-export default function Navbar() {
+type NavbarProps = {
+  siteName: string;
+  nameLead: string;
+  nameAccent: string;
+};
+
+export default function Navbar({ siteName, nameLead, nameAccent }: NavbarProps) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -32,14 +38,15 @@ export default function Navbar() {
         <Link href="/" className="group flex items-center gap-2.5" prefetch>
           <Image
             src="/logo.png"
-            alt="AI 업무활용 실무교육"
+            alt={siteName}
             width={36}
             height={36}
             className="h-9 w-9 rounded-xl object-contain"
             priority
           />
           <span className="text-lg font-semibold tracking-tight text-slate-900">
-            AI 업무활용 <span className="text-violet-600">실무교육</span>
+            {nameLead}
+            {nameAccent && <span className="text-violet-600">{nameAccent}</span>}
           </span>
         </Link>
 
