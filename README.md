@@ -14,7 +14,8 @@ Vercel + Supabase 기반 강의 사이트입니다.
 ### 1. Supabase 설정
 
 1. [Supabase](https://supabase.com)에서 프로젝트 생성
-2. **Storage** → 새 버킷 `materials` 생성 (Private 권장)
+2. **Storage** → 버킷 `materials`, `question-images` 생성 (둘 다 Private)
+   - 또는 환경 변수를 넣은 뒤 `node --env-file=.env scripts/setup-storage.mjs` 로 한 번에 생성
 3. **Settings → Database**에서 Connection string 복사
    - `DATABASE_URL`: Transaction pooler (포트 6543)
    - `DIRECT_URL`: Direct connection (포트 5432)
@@ -54,6 +55,15 @@ http://localhost:3000 에서 확인
 ```bash
 npx prisma migrate deploy
 ```
+
+## Supabase 일시 중지 방지 (keep-alive)
+
+Supabase 무료 플랜은 7일간 활동이 없으면 프로젝트가 일시 중지됩니다.
+`vercel.json`의 Cron이 3일마다(UTC 0시 = 한국 오전 9시) `/api/keep-alive`를 호출해 DB에 가벼운 조회를 보냅니다.
+
+- Vercel 환경 변수 `CRON_SECRET` 필요 (없거나 다르면 401로 거절되어 조회가 일어나지 않음)
+- 확인: Vercel → Settings → Cron Jobs → **Run** → 응답 `{"ok":true,...}`
+- 이미 일시 중지됐다면 Supabase 대시보드에서 **Restore**
 
 ## 강사 사용법
 
